@@ -54,7 +54,9 @@ library Checkpoints {
     function upperLookup(Trace224 storage self, uint32 key) internal view returns (uint224) {
         uint256 len = self._checkpoints.length;
         uint256 pos = _upperBinaryLookup(self._checkpoints, key, 0, len);
-        return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        unchecked {
+            return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        }
     }
 
     /**
@@ -79,7 +81,9 @@ library Checkpoints {
 
         uint256 pos = _upperBinaryLookup(self._checkpoints, key, low, high);
 
-        return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        unchecked {
+            return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        }
     }
 
     /**
@@ -87,7 +91,9 @@ library Checkpoints {
      */
     function latest(Trace224 storage self) internal view returns (uint224) {
         uint256 pos = self._checkpoints.length;
-        return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        unchecked {
+            return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        }
     }
 
     /**
@@ -99,8 +105,10 @@ library Checkpoints {
         if (pos == 0) {
             return (false, 0, 0);
         } else {
-            Checkpoint224 memory ckpt = _unsafeAccess(self._checkpoints, pos - 1);
-            return (true, ckpt._key, ckpt._value);
+            unchecked {
+                Checkpoint224 memory ckpt = _unsafeAccess(self._checkpoints, pos - 1);
+                return (true, ckpt._key, ckpt._value);
+            }
         }
     }
 
@@ -127,7 +135,10 @@ library Checkpoints {
 
         if (pos > 0) {
             // Copying to memory is important here.
-            Checkpoint224 memory last = _unsafeAccess(self, pos - 1);
+            Checkpoint224 memory last;
+            unchecked {
+                last = _unsafeAccess(self, pos - 1);
+            }
 
             // Checkpoint keys must be non-decreasing.
             if (last._key > key) {
@@ -136,7 +147,9 @@ library Checkpoints {
 
             // Update or push new checkpoint
             if (last._key == key) {
-                _unsafeAccess(self, pos - 1)._value = value;
+                unchecked {
+                    _unsafeAccess(self, pos - 1)._value = value;
+                }
             } else {
                 self.push(Checkpoint224({_key: key, _value: value}));
             }
@@ -164,7 +177,9 @@ library Checkpoints {
             if (_unsafeAccess(self, mid)._key > key) {
                 high = mid;
             } else {
-                low = mid + 1;
+                unchecked {
+                    low = mid + 1;
+                }
             }
         }
         return high;
@@ -185,7 +200,9 @@ library Checkpoints {
         while (low < high) {
             uint256 mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._key < key) {
-                low = mid + 1;
+                unchecked {
+                    low = mid + 1;
+                }
             } else {
                 high = mid;
             }
@@ -241,7 +258,9 @@ library Checkpoints {
     function upperLookup(Trace160 storage self, uint96 key) internal view returns (uint160) {
         uint256 len = self._checkpoints.length;
         uint256 pos = _upperBinaryLookup(self._checkpoints, key, 0, len);
-        return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        unchecked {
+            return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        }
     }
 
     /**
@@ -266,7 +285,9 @@ library Checkpoints {
 
         uint256 pos = _upperBinaryLookup(self._checkpoints, key, low, high);
 
-        return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        unchecked {
+            return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        }
     }
 
     /**
@@ -274,7 +295,9 @@ library Checkpoints {
      */
     function latest(Trace160 storage self) internal view returns (uint160) {
         uint256 pos = self._checkpoints.length;
-        return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        unchecked {
+            return pos == 0 ? 0 : _unsafeAccess(self._checkpoints, pos - 1)._value;
+        }
     }
 
     /**
@@ -286,8 +309,10 @@ library Checkpoints {
         if (pos == 0) {
             return (false, 0, 0);
         } else {
-            Checkpoint160 memory ckpt = _unsafeAccess(self._checkpoints, pos - 1);
-            return (true, ckpt._key, ckpt._value);
+            unchecked {
+                Checkpoint160 memory ckpt = _unsafeAccess(self._checkpoints, pos - 1);
+                return (true, ckpt._key, ckpt._value);
+            }
         }
     }
 
@@ -314,7 +339,10 @@ library Checkpoints {
 
         if (pos > 0) {
             // Copying to memory is important here.
-            Checkpoint160 memory last = _unsafeAccess(self, pos - 1);
+            Checkpoint160 memory last;
+            unchecked {
+                last = _unsafeAccess(self, pos - 1);
+            }
 
             // Checkpoint keys must be non-decreasing.
             if (last._key > key) {
@@ -323,7 +351,9 @@ library Checkpoints {
 
             // Update or push new checkpoint
             if (last._key == key) {
-                _unsafeAccess(self, pos - 1)._value = value;
+                unchecked {
+                    _unsafeAccess(self, pos - 1)._value = value;
+                }
             } else {
                 self.push(Checkpoint160({_key: key, _value: value}));
             }
@@ -351,7 +381,9 @@ library Checkpoints {
             if (_unsafeAccess(self, mid)._key > key) {
                 high = mid;
             } else {
-                low = mid + 1;
+                unchecked {
+                    low = mid + 1;
+                }
             }
         }
         return high;
@@ -372,7 +404,9 @@ library Checkpoints {
         while (low < high) {
             uint256 mid = Math.average(low, high);
             if (_unsafeAccess(self, mid)._key < key) {
-                low = mid + 1;
+                unchecked {
+                    low = mid + 1;
+                }
             } else {
                 high = mid;
             }
