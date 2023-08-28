@@ -54,9 +54,11 @@ library DoubleEndedQueue {
     function pushBack(Bytes32Deque storage deque, bytes32 value) internal {
         unchecked {
             uint128 backIndex = deque._end;
-            if (backIndex + 1 == deque._begin) revert QueueFull();
-            deque._data[backIndex] = value;
+            uint128 frontIndex = deque._begin;
+            if (backIndex + 1 == frontIndex) revert QueueFull();
+            deque._begin = frontIndex; // prevents redundant SLOAD
             deque._end = backIndex + 1;
+            deque._data[backIndex] = value;
         }
     }
 
@@ -68,11 +70,13 @@ library DoubleEndedQueue {
     function popBack(Bytes32Deque storage deque) internal returns (bytes32 value) {
         unchecked {
             uint128 backIndex = deque._end;
-            if (backIndex == deque._begin) revert QueueEmpty();
+            uint128 frontIndex = deque._begin;
+            if (backIndex == frontIndex) revert QueueEmpty();
             --backIndex;
+            deque._begin = frontIndex; // prevents redundant SLOAD
+            deque._end = backIndex;
             value = deque._data[backIndex];
             delete deque._data[backIndex];
-            deque._end = backIndex;
         }
     }
 
@@ -82,9 +86,11 @@ library DoubleEndedQueue {
     function pushFront(Bytes32Deque storage deque, bytes32 value) internal {
         unchecked {
             uint128 frontIndex = deque._begin - 1;
-            if (frontIndex == deque._end) revert QueueFull();
-            deque._data[frontIndex] = value;
+            uint128 backIndex = deque._end;
+            if (frontIndex == backIndex) revert QueueFull();
             deque._begin = frontIndex;
+            deque._end = backIndex; // prevents redundant SLOAD
+            deque._data[frontIndex] = value;
         }
     }
 
@@ -96,10 +102,12 @@ library DoubleEndedQueue {
     function popFront(Bytes32Deque storage deque) internal returns (bytes32 value) {
         unchecked {
             uint128 frontIndex = deque._begin;
-            if (frontIndex == deque._end) revert QueueEmpty();
+            uint128 backIndex = deque._end;
+            if (frontIndex == backIndex) revert QueueEmpty();
+            deque._begin = frontIndex + 1;
+            deque._end = backIndex; // prevents redundant SLOAD
             value = deque._data[frontIndex];
             delete deque._data[frontIndex];
-            deque._begin = frontIndex + 1;
         }
     }
 
